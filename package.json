@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "mysql": "^2.18.1",
+    "node": "^20.7.0",
+    "typescript": "^5.2.2"
+  }
+}
