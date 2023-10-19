@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "mariadb": "^3.2.2",
     "mysql": "^2.18.1",
     "node": "^20.7.0",
     "typescript": "^5.2.2"
