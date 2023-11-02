@@ -1,6 +1,6 @@
 ### 📥 Installation
 
-You first need to your MySQL:
+You first need to enter to your MySQL:
 
 ```bash
 mysql -u root -p
