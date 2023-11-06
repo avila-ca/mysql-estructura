@@ -3,13 +3,16 @@ SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
 CREATE SCHEMA IF NOT EXISTS `mydb` DEFAULT CHARACTER SET utf8 ;
 USE `mydb` ;
 
 -- -----------------------------------------------------
--- Table `mydb`.`PROVEIDOR`
+-- Table `mydb`.`proveidor`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`PROVEIDOR` (
+CREATE TABLE IF NOT EXISTS `mydb`.`proveidor` (
   `id_proveidor` INT NOT NULL,
   `NIF` VARCHAR(9) NOT NULL,
   `nom` VARCHAR(45) NOT NULL,
@@ -21,20 +24,19 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`EMPLEAT`
+-- Table `mydb`.`empleat`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`EMPLEAT` (
+CREATE TABLE IF NOT EXISTS `mydb`.`empleat` (
   `id_empleat` INT NOT NULL,
   `nom` VARCHAR(45) NULL,
-  `ID_Client` INT NOT NULL,
-  PRIMARY KEY (`ID_Client`, `id_empleat`))
+  PRIMARY KEY (`id_empleat`))
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`ULLERES`
+-- Table `mydb`.`ulleres`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`ULLERES` (
+CREATE TABLE IF NOT EXISTS `mydb`.`ulleres` (
   `id_ullera` INT NOT NULL,
   `marca` VARCHAR(30) NOT NULL,
   `graduacio` DECIMAL(2) NOT NULL,
@@ -42,20 +44,20 @@ CREATE TABLE IF NOT EXISTS `mydb`.`ULLERES` (
   `colorMuntura` VARCHAR(45) NOT NULL,
   `colorVidre` VARCHAR(45) NOT NULL,
   `preu` DECIMAL(2) NOT NULL,
-  `EMPLEAT_ID_Client` INT NOT NULL,
-  `EMPLEAT_id_empleat` INT NOT NULL,
-  `PROVEIDOR_id_proveidor` INT NOT NULL,
-  PRIMARY KEY (`EMPLEAT_ID_Client`, `EMPLEAT_id_empleat`, `id_ullera`, `PROVEIDOR_id_proveidor`),
-  INDEX `fk_ULLERES_EMPLEAT1_idx` (`EMPLEAT_ID_Client` ASC, `EMPLEAT_id_empleat` ASC) VISIBLE,
-  INDEX `fk_ULLERES_PROVEIDOR1_idx` (`PROVEIDOR_id_proveidor` ASC) VISIBLE,
-  CONSTRAINT `fk_ULLERES_EMPLEAT1`
-    FOREIGN KEY (`EMPLEAT_ID_Client` , `EMPLEAT_id_empleat`)
-    REFERENCES `mydb`.`EMPLEAT` (`ID_Client` , `id_empleat`)
+  `proveidor_id_proveidor` INT NOT NULL,
+  `empleat_ID_Client` INT NOT NULL,
+  `empleat_id_empleat` INT NOT NULL,
+  PRIMARY KEY (`id_ullera`, `proveidor_id_proveidor`, `empleat_ID_Client`, `empleat_id_empleat`),
+  INDEX `fk_ulleres_proveidor1_idx` (`proveidor_id_proveidor` ASC) VISIBLE,
+  INDEX `fk_ulleres_empleat1_idx` (`empleat_ID_Client` ASC, `empleat_id_empleat` ASC) VISIBLE,
+  CONSTRAINT `fk_ulleres_proveidor1`
+    FOREIGN KEY (`proveidor_id_proveidor`)
+    REFERENCES `mydb`.`proveidor` (`id_proveidor`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_ULLERES_PROVEIDOR1`
-    FOREIGN KEY (`PROVEIDOR_id_proveidor`)
-    REFERENCES `mydb`.`PROVEIDOR` (`id_proveidor`)
+  CONSTRAINT `fk_ulleres_empleat1`
+    FOREIGN KEY (`empleat_id_empleat`)
+    REFERENCES `mydb`.`empleat` (`id_empleat`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -63,9 +65,9 @@ COMMENT = '	';
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`CLIENT`
+-- Table `mydb`.`client`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`CLIENT` (
+CREATE TABLE IF NOT EXISTS `mydb`.`client` (
   `id_client` INT NOT NULL,
   `nom` VARCHAR(45) NOT NULL,
   `adreça` VARCHAR(45) NULL,
@@ -78,24 +80,23 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`EMPLEAT_has_CLIENT`
+-- Table `mydb`.`empleat_has_client`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`EMPLEAT_has_CLIENT` (
-  `EMPLEAT_ID_Client` INT NOT NULL,
-  `EMPLEAT_id_empleat` INT NOT NULL,
-  `CLIENT_ID_Client` INT NOT NULL,
-  `CLIENT_recomana_IDClient` INT NOT NULL,
-  PRIMARY KEY (`EMPLEAT_ID_Client`, `EMPLEAT_id_empleat`, `CLIENT_ID_Client`, `CLIENT_recomana_IDClient`),
-  INDEX `fk_EMPLEAT_has_CLIENT_CLIENT1_idx` (`CLIENT_ID_Client` ASC, `CLIENT_recomana_IDClient` ASC) VISIBLE,
-  INDEX `fk_EMPLEAT_has_CLIENT_EMPLEAT1_idx` (`EMPLEAT_ID_Client` ASC, `EMPLEAT_id_empleat` ASC) VISIBLE,
-  CONSTRAINT `fk_EMPLEAT_has_CLIENT_EMPLEAT1`
-    FOREIGN KEY (`EMPLEAT_ID_Client` , `EMPLEAT_id_empleat`)
-    REFERENCES `mydb`.`EMPLEAT` (`ID_Client` , `id_empleat`)
+CREATE TABLE IF NOT EXISTS `mydb`.`empleat_has_client` (
+  `empleat_id_empleat` INT NOT NULL,
+  `client_recomana_IDClient` INT NOT NULL,
+  `client_id_client` INT NOT NULL,
+  PRIMARY KEY (`empleat_id_empleat`, `client_recomana_IDClient`, `client_id_client`),
+  INDEX `fk_empleat_has_client_client1_idx` (`client_recomana_IDClient` ASC, `client_id_client` ASC) VISIBLE,
+  INDEX `fk_empleat_has_client_empleat1_idx` (`empleat_id_empleat` ASC) VISIBLE,
+  CONSTRAINT `fk_empleat_has_client_empleat1`
+    FOREIGN KEY (`empleat_id_empleat`)
+    REFERENCES `mydb`.`empleat` (`id_empleat`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_EMPLEAT_has_CLIENT_CLIENT1`
-    FOREIGN KEY (`CLIENT_recomana_IDClient`)
-    REFERENCES `mydb`.`CLIENT` (`recomana_IDClient`)
+  CONSTRAINT `fk_empleat_has_client_client1`
+    FOREIGN KEY (`client_recomana_IDClient` , `client_id_client`)
+    REFERENCES `mydb`.`client` (`recomana_IDClient` , `id_client`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
